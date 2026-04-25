@@ -12,9 +12,10 @@ function Set-KioskPolicy {
     $exp = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer"
     New-Item -Path $sys -Force | Out-Null
     New-Item -Path $exp -Force | Out-Null
-    # Disable Task Manager and workstation lock from the Ctrl+Alt+Del screen
+    # Disable common Ctrl+Alt+Del escape paths for the arcade user session.
     Set-ItemProperty -Path $sys -Name DisableTaskMgr        -Value 1 -Type DWord -Force
     Set-ItemProperty -Path $sys -Name DisableLockWorkstation -Value 1 -Type DWord -Force
+    Set-ItemProperty -Path $sys -Name DisableChangePassword -Value 1 -Type DWord -Force
     # Suppress Win key and Run dialog
     Set-ItemProperty -Path $exp -Name NoWinKeys             -Value 1 -Type DWord -Force
     Set-ItemProperty -Path $exp -Name NoRun                 -Value 1 -Type DWord -Force

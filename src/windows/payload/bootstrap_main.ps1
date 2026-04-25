@@ -674,6 +674,27 @@ function Ensure-ArcadePermissions {
     }
 }
 
+function Ensure-KioskMachinePolicies {
+    try {
+        $SystemPoliciesRoot = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"
+        $PersonalizationPoliciesRoot = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Personalization"
+
+        New-Item -Path $SystemPoliciesRoot -Force | Out-Null
+        New-Item -Path $PersonalizationPoliciesRoot -Force | Out-Null
+
+        # Skip the secure-attention requirement at logon and hide user-switching paths.
+        Set-ItemProperty -Path $SystemPoliciesRoot -Name DisableCAD -Value 1 -Type DWord -Force
+        Set-ItemProperty -Path $SystemPoliciesRoot -Name HideFastUserSwitching -Value 1 -Type DWord -Force
+
+        # Remove the lock screen transition.
+        Set-ItemProperty -Path $PersonalizationPoliciesRoot -Name NoLockScreen -Value 1 -Type DWord -Force
+
+        Write-Info "Applied machine-wide kiosk policies"
+    } catch {
+        Fail-Step "Failed applying machine-wide kiosk policies - $($_.Exception.Message)"
+    }
+}
+
 function Ensure-ScheduledTaskEx {
     param(
         [Parameter(Mandatory = $true)][string]$TaskName,
@@ -800,6 +821,7 @@ try {
 
     Stage-Payload
     Ensure-ArcadePermissions
+    Ensure-KioskMachinePolicies
     Ensure-AudioServices
     Check-NvidiaDriver
     Ensure-Chocolatey
