@@ -576,27 +576,11 @@ function Ensure-MicrophonePrivacy {
     }
 }
 
-function Test-ViGEmInstalled {
-    try {
-        $devices = Get-PnpDevice -ErrorAction SilentlyContinue | Where-Object {
-            $_.FriendlyName -match "ViGEm" -or $_.InstanceId -match "ViGEm" -or $_.Class -eq "System"
-        }
-        return [bool]($devices | Select-Object -First 1)
-    } catch {
-        return $false
-    }
-}
-
 function Ensure-ViGEmBus {
     param($Config)
 
     if (-not $Config.install_vigem) {
         Write-Info "ViGEmBus install disabled in config"
-        return
-    }
-
-    if (Test-ViGEmInstalled) {
-        Write-Info "ViGEmBus appears to already be installed"
         return
     }
 
@@ -607,6 +591,7 @@ function Ensure-ViGEmBus {
     Ensure-Directory -Path $ViGEmRoot
 
     if (-not (Test-Path $InstallerPath)) {
+        Write-Info "Downloading ViGEmBus installer"
         Download-File -Url $Config.vigem_installer_url -Destination $InstallerPath
     } else {
         Write-Info "ViGEmBus installer already staged"
@@ -632,11 +617,15 @@ function Ensure-ViGEmBus {
     if (-not (Test-Path $InfPath))     { Fail-Step "ViGEmBus.inf not found at $InfPath" }
     if (-not (Test-Path $NefconwPath)) { Fail-Step "nefconw.exe not found at $NefconwPath" }
 
+    Write-Info "Using extracted ViGEmBus payload from $($ExtractedRoot.FullName)"
+
     Push-Location $ExtractedRoot.FullName
     try {
-        Write-Info "Preparing ViGEmBus device node"
+        Write-Info "Removing existing ViGEmBus device nodes if present"
         .\nefconw.exe --remove-device-node --hardware-id Nefarius\ViGEmBus\Gen1 --class-guid 4D36E97D-E325-11CE-BFC1-08002BE10318 | Out-Null
         .\nefconw.exe --remove-device-node --hardware-id Root\ViGEmBus --class-guid 4D36E97D-E325-11CE-BFC1-08002BE10318 | Out-Null
+
+        Write-Info "Creating ViGEmBus device node"
         .\nefconw.exe --create-device-node --hardware-id Nefarius\ViGEmBus\Gen1 --class-name System --class-guid 4D36E97D-E325-11CE-BFC1-08002BE10318 | Out-Null
         if ($LASTEXITCODE -ne 0) {
             Fail-Step "Failed creating ViGEmBus device node"
