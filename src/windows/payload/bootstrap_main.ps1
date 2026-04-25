@@ -675,23 +675,58 @@ function Ensure-ArcadePermissions {
 }
 
 function Ensure-KioskMachinePolicies {
+    $SystemPoliciesRoot = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"
+    $PersonalizationPoliciesRoot = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Personalization"
+
+    $PolicyWrites = @(
+        @{ Path = $SystemPoliciesRoot; Name = "DisableCAD"; Value = 1; Description = "Disabled secure attention requirement at logon" },
+        @{ Path = $SystemPoliciesRoot; Name = "HideFastUserSwitching"; Value = 1; Description = "Hid fast user switching" },
+        @{ Path = $PersonalizationPoliciesRoot; Name = "NoLockScreen"; Value = 1; Description = "Disabled lock screen" }
+    )
+
+    foreach ($Policy in $PolicyWrites) {
+        try {
+            New-Item -Path $Policy.Path -Force | Out-Null
+            Set-ItemProperty -Path $Policy.Path -Name $Policy.Name -Value $Policy.Value -Type DWord -Force
+            Write-Info $Policy.Description
+        } catch {
+            Write-WarnStep "Could not apply kiosk policy $($Policy.Name): $($_.Exception.Message)"
+        }
+    }
+}
+
+function Ensure-GameUserProfile {
+    param($Config)
+
+    $ProfileRoot = Join-Path "C:\Users" $Config.game_user
+    $NtuserPath = Join-Path $ProfileRoot "NTUSER.DAT"
+
+    if (Test-Path $NtuserPath) {
+        Write-Info "Arcade user profile already initialized at $ProfileRoot"
+        return
+    }
+
     try {
-        $SystemPoliciesRoot = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"
-        $PersonalizationPoliciesRoot = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Personalization"
+        $SecurePass = ConvertTo-SecureString $Config.game_user_password -AsPlainText -Force
+        $Credential = New-Object System.Management.Automation.PSCredential($Config.game_user, $SecurePass)
 
-        New-Item -Path $SystemPoliciesRoot -Force | Out-Null
-        New-Item -Path $PersonalizationPoliciesRoot -Force | Out-Null
+        Write-Info "Initializing arcade user profile for $($Config.game_user)"
+        $Process = Start-Process `
+            -FilePath "powershell.exe" `
+            -ArgumentList "-NoProfile -WindowStyle Hidden -Command `"Start-Sleep -Seconds 3`"" `
+            -Credential $Credential `
+            -WorkingDirectory $ArcadeRoot `
+            -PassThru
 
-        # Skip the secure-attention requirement at logon and hide user-switching paths.
-        Set-ItemProperty -Path $SystemPoliciesRoot -Name DisableCAD -Value 1 -Type DWord -Force
-        Set-ItemProperty -Path $SystemPoliciesRoot -Name HideFastUserSwitching -Value 1 -Type DWord -Force
+        $Process.WaitForExit()
 
-        # Remove the lock screen transition.
-        Set-ItemProperty -Path $PersonalizationPoliciesRoot -Name NoLockScreen -Value 1 -Type DWord -Force
-
-        Write-Info "Applied machine-wide kiosk policies"
+        if (-not (Test-Path $NtuserPath)) {
+            Add-ManualStep "Arcade user profile was not created automatically. Log in once as $($Config.game_user), then log back out before arming arcade mode."
+        } else {
+            Write-Info "Initialized arcade user profile at $ProfileRoot"
+        }
     } catch {
-        Fail-Step "Failed applying machine-wide kiosk policies - $($_.Exception.Message)"
+        Add-ManualStep "Could not initialize the arcade user profile automatically: $($_.Exception.Message). Log in once as $($Config.game_user), then log back out before arming arcade mode."
     }
 }
 
@@ -829,6 +864,7 @@ try {
     Ensure-StreamingPackages -Config $Config
     Ensure-MediaMTX -Config $Config
     Ensure-GameUser -Config $Config
+    Ensure-GameUserProfile -Config $Config
     Ensure-VirtualDisplayDriver -Config $Config
     Ensure-Voicemeeter -Config $Config
     Ensure-VBCable -Config $Config
