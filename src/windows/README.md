@@ -28,11 +28,8 @@ That responsibility lives in the separate provisioning/orchestrator repo.
 
 ## Directory Layout
 
-- [bootstrap.xml](/Users/glam3k/projects/umvc3247/images/bootstrap.xml)
-  Thin launcher run on a fresh Windows machine. It writes the local config JSON, downloads the payload scripts from the configured gist/raw URL, and runs the main bootstrap script.
-
-- [payload/bootstrap_main.ps1](/Users/glam3k/projects/umvc3247/images/payload/bootstrap_main.ps1)
-  Main image-prep script. Installs/configures the machine-level pieces and writes first-boot completion markers.
+- `payload/bootstrap_main.ps1`
+  Portable Windows bootstrap entrypoint. Copy this script onto a fresh Windows machine, edit the config block at the top if needed, and run it as Administrator.
 
 - [payload/start_arcade_mode.ps1](/Users/glam3k/projects/umvc3247/images/payload/start_arcade_mode.ps1)
   Machine-level watchdog script.
@@ -107,7 +104,8 @@ The main bootstrap currently handles:
 - installing `ffmpeg` via Chocolatey
 - staging MediaMTX under `C:\Arcade`
 - downloading/extracting/installing pinned ViGEmBus `v1.22.0` with the Windows Server workaround path
-- staging the Virtual Display Driver zip under `C:\Arcade\VirtualDisplayDriver`
+- enabling microphone access machine-wide and for both the current admin user and the arcade user
+- staging the VDD control package under `C:\Arcade\VirtualDisplayDriver`
 - staging the Voicemeeter zip under `C:\Arcade\Voicemeeter`
 - staging the VB-Cable zip under `C:\Arcade\VBCable`
 - creating the arcade user
@@ -142,7 +140,7 @@ This image flow assumes the target application may need a virtual display/headle
 
 You may need to manually:
 
-- install the staged virtual display driver from `C:\Arcade\VirtualDisplayDriver\extracted`
+- run the included installer from `C:\Arcade\VirtualDisplayDriver\extracted`
 - verify the correct display is active
 - point Sunshine at the correct display device id
 
@@ -188,15 +186,17 @@ You must manually:
 ### Phase 1: Seed Machine
 
 1. Launch a fresh Windows Server 2022 machine.
-2. Copy or run [bootstrap.xml](/Users/glam3k/projects/umvc3247/images/bootstrap.xml) on that machine.
-3. Wait for the bootstrap to complete.
+2. Copy `payload/bootstrap_main.ps1` onto that machine.
+3. Edit the config block at the top if you need to change defaults such as `PayloadRef`, `GameUserPassword`, or capture settings.
+4. Run it in an elevated PowerShell session.
+5. Wait for the bootstrap to complete.
 
 Useful checks:
 
 ```powershell
 Get-ChildItem C:\Arcade
-Get-Content C:\Arcade\bootstrap-launcher.log -Tail 100
 Get-Content C:\Arcade\bootstrap.log -Tail 200
+Get-Content C:\Arcade\manual-steps.txt
 Test-Path C:\Arcade\bootstrap.complete
 ```
 

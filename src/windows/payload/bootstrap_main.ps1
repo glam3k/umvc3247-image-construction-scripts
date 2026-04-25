@@ -36,7 +36,7 @@ $PayloadRef     = "main"
 $PayloadBaseUrl = "https://raw.githubusercontent.com/glam3k/umvc3247-image-construction-scripts/$PayloadRef/src/windows/payload"
 
 $GameUser         = "ArcadePlayer"
-$GameUserPassword = "REPLACE_WITH_STRONG_PASSWORD"
+$GameUserPassword = "OverdraftAlarmThinly3!"
 
 $LaunchOnLogin = $false
 
@@ -73,7 +73,7 @@ $MediaMTXVersion = "v1.17.1"
 $MediaMTXZipUrl  = "https://github.com/bluenviron/mediamtx/releases/download/v1.17.1/mediamtx_v1.17.1_windows_amd64.zip"
 $ViGEmBusVersion = "v1.22.0"
 $ViGEmBusInstallerUrl = "https://github.com/nefarius/ViGEmBus/releases/download/v1.22.0/ViGEmBus_1.22.0_x64_x86_arm64.exe"
-$VirtualDisplayDriverUrl = "https://github.com/VirtualDrivers/Virtual-Display-Driver/releases/download/25.7.23/VirtualDisplayDriver-x86.Driver.Only.zip"
+$VirtualDisplayDriverUrl = "https://github.com/VirtualDrivers/Virtual-Display-Driver/releases/download/25.7.23/VDD.Control.25.7.23.zip"
 $VoicemeeterZipUrl = "https://download.vb-audio.com/Download_CABLE/VoicemeeterSetup_v1122.zip"
 $VBCableZipUrl     = "https://download.vb-audio.com/Download_CABLE/VBCABLE_Driver_Pack45.zip"
 
@@ -429,7 +429,7 @@ function Ensure-VirtualDisplayDriver {
     }
 
     $RootPath = Join-Path $ArcadeRoot "VirtualDisplayDriver"
-    $ZipPath  = Join-Path $RootPath "VirtualDisplayDriver-x86.Driver.Only.zip"
+    $ZipPath  = Join-Path $RootPath "VDD.Control.25.7.23.zip"
     $ExtractPath = Join-Path $RootPath "extracted"
 
     Ensure-Directory -Path $RootPath
@@ -441,7 +441,7 @@ function Ensure-VirtualDisplayDriver {
     }
 
     Expand-ZipToDirectory -ZipPath $ZipPath -Destination $ExtractPath
-    Add-ManualStep "Virtual display driver staged at $ExtractPath. Install it manually, then verify Sunshine is targeting the correct display."
+    Add-ManualStep "Virtual display control package staged at $ExtractPath. Run the included installer manually, then verify Sunshine is targeting the correct display."
 }
 
 function Test-VoicemeeterInstalled {
@@ -535,6 +535,41 @@ function Ensure-MicrophonePrivacy {
             New-Item -Path $DesktopAppsPath -Force | Out-Null
             New-ItemProperty -Path $DesktopAppsPath -Name "Value" -Value "Allow" -PropertyType String -Force | Out-Null
             Write-Info "Enabled desktop app microphone access"
+        }
+
+        $TargetUserSids = @()
+
+        try {
+            $CurrentUserSid = [Security.Principal.WindowsIdentity]::GetCurrent().User.Value
+            if (-not [string]::IsNullOrWhiteSpace($CurrentUserSid)) {
+                $TargetUserSids += $CurrentUserSid
+            }
+        } catch {}
+
+        try {
+            $ArcadeUser = Get-LocalUser -Name $Config.game_user -ErrorAction SilentlyContinue
+            if ($ArcadeUser -and $ArcadeUser.SID) {
+                $TargetUserSids += $ArcadeUser.SID.Value
+            }
+        } catch {}
+
+        $TargetUserSids = $TargetUserSids | Select-Object -Unique
+
+        foreach ($Sid in $TargetUserSids) {
+            $UserConsentStoreRoot = "Registry::HKEY_USERS\$Sid\Software\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\microphone"
+            New-Item -Path $UserConsentStoreRoot -Force | Out-Null
+
+            if ($Config.microphone_access_global) {
+                New-ItemProperty -Path $UserConsentStoreRoot -Name "Value" -Value "Allow" -PropertyType String -Force | Out-Null
+            }
+
+            if ($Config.microphone_access_desktop) {
+                $UserDesktopAppsPath = Join-Path $UserConsentStoreRoot "NonPackaged"
+                New-Item -Path $UserDesktopAppsPath -Force | Out-Null
+                New-ItemProperty -Path $UserDesktopAppsPath -Name "Value" -Value "Allow" -PropertyType String -Force | Out-Null
+            }
+
+            Write-Info "Enabled microphone access for user SID $Sid"
         }
     } catch {
         Write-WarnStep "Failed applying microphone privacy settings: $($_.Exception.Message)"
@@ -782,12 +817,12 @@ try {
     Ensure-GamePackages -Config $Config
     Ensure-StreamingPackages -Config $Config
     Ensure-MediaMTX -Config $Config
+    Ensure-GameUser -Config $Config
     Ensure-VirtualDisplayDriver -Config $Config
     Ensure-Voicemeeter -Config $Config
     Ensure-VBCable -Config $Config
     Ensure-MicrophonePrivacy -Config $Config
     Ensure-ViGEmBus -Config $Config
-    Ensure-GameUser -Config $Config
     Ensure-ScheduledTasks -Config $Config
     Ensure-GameLaunchPlaceholder
     Ensure-ExitGamePlaceholder
