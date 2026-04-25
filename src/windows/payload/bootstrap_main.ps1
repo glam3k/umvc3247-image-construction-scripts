@@ -874,6 +874,7 @@ try {
     Ensure-GameLaunchPlaceholder
     Ensure-ExitGamePlaceholder
     Ensure-MaintenanceFlag
+    Add-ManualStep "When setup is complete, run C:\Arcade\Arm-ArcadeMode.ps1, then reboot to enter arcade mode."
     Write-BootstrapCompleteMarker
 
     Write-Info "Bootstrap converge run completed successfully"

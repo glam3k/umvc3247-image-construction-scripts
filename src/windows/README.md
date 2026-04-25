@@ -215,6 +215,8 @@ After bootstrap:
 9. Launch Steam and log in
 10. Install the game
 11. Replace `C:\Arcade\Launch-Game.cmd` with the real game launcher
+12. Run `C:\Arcade\Arm-ArcadeMode.ps1`
+13. Reboot into arcade mode
 
 ### Phase 3: Arcade Mode Validation
 
