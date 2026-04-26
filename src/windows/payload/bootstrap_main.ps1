@@ -788,7 +788,7 @@ function Ensure-ScheduledTasks {
         -Enabled ([bool]$Config.enable_capture_task)
 }
 
-function Ensure-GameLaunchPlaceholder {
+function Ensure-GameLaunchCommand {
     if (Test-Path $LaunchGameCmdPath) {
         Write-Info "Using existing game launcher at $LaunchGameCmdPath"
         return
@@ -796,12 +796,10 @@ function Ensure-GameLaunchPlaceholder {
 
 @"
 @echo off
-echo. > C:\Arcade\game.running
-powershell.exe -ExecutionPolicy Bypass -NoProfile -Command "Add-Type -AssemblyName PresentationFramework; [System.Windows.MessageBox]::Show('Game launched', 'Arcade Test') | Out-Null"
-del C:\Arcade\game.running 2>nul
+start /wait powershell.exe -ExecutionPolicy Bypass -NoProfile -File "C:\Arcade\Launch-Game.ps1"
 "@ | Set-Content -Path $LaunchGameCmdPath -Encoding ASCII
 
-    Write-Info "Wrote placeholder Launch-Game.cmd"
+    Write-Info "Wrote Launch-Game.cmd wrapper for Launch-Game.ps1"
 }
 
 function Ensure-ExitGamePlaceholder {
@@ -873,7 +871,7 @@ try {
     Ensure-MicrophonePrivacy -Config $Config
     Ensure-ViGEmBus -Config $Config
     Ensure-ScheduledTasks -Config $Config
-    Ensure-GameLaunchPlaceholder
+    Ensure-GameLaunchCommand
     Ensure-ExitGamePlaceholder
     Ensure-MaintenanceFlag
     Add-ManualStep "When setup is complete, run C:\Arcade\Arm-ArcadeMode.ps1, then reboot to enter arcade mode."
