@@ -9,9 +9,9 @@ $BackgroundImage = "C:\Arcade\background.jpg"
 $ConfigPath      = "C:\Arcade\arcade-config.json"
 $Log             = "C:\Arcade\arcade-shell.log"
 
-$Pumvc3SpecialInstructionsPath = "C:\Arcade\pumvc3_special_instructions.txt"
-$Pumvc3Helper120Path           = "C:\Arcade\Games\Umvc3_PUMVC3\"
-$Pumvc3Helper143Path           = "C:\Arcade\Games\Umvc3_PUMVC3\"
+$Pumvc3SpecialInstructionsPath = "C:\Arcade\pmvc3_special_instructions.txt"
+$Pumvc3Helper120Path           = "C:\Arcade\Games\Umvc3_PMVC3\"
+$Pumvc3Helper143Path           = "C:\Arcade\Games\Umvc3_PMVC3\"
 
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
@@ -237,41 +237,41 @@ function Open-Pumvc3SpecialInstructions {
     } else {
         [System.Windows.Forms.MessageBox]::Show(
             "Instructions file not found at $Pumvc3SpecialInstructionsPath",
-            "PUMVC3 Special Instructions",
+            "PMVC3 Special Instructions",
             "OK",
             "Warning"
         ) | Out-Null
-        Log "PUMVC3 special instructions file not found: $Pumvc3SpecialInstructionsPath"
+        Log "PMVC3 special instructions file not found: $Pumvc3SpecialInstructionsPath"
     }
 }
 
 function Open-Pumvc3Helper120 {
     if (Test-Path $Pumvc3Helper120Path) {
         Start-Process -FilePath $Pumvc3Helper120Path
-        Log "Opened PUMVC3 1.20 Helper"
+        Log "Opened PMVC3 1.20 Helper"
     } else {
         [System.Windows.Forms.MessageBox]::Show(
             "Helper executable not found at $Pumvc3Helper120Path",
-            "PUMVC3 1.20 Helper",
+            "PMVC3 1.20 Helper",
             "OK",
             "Warning"
         ) | Out-Null
-        Log "PUMVC3 1.20 Helper not found: $Pumvc3Helper120Path"
+        Log "PMVC3 1.20 Helper not found: $Pumvc3Helper120Path"
     }
 }
 
 function Open-Pumvc3Helper143 {
     if (Test-Path $Pumvc3Helper143Path) {
         Start-Process -FilePath $Pumvc3Helper143Path
-        Log "Opened PUMVC3 1.4.3 Helper"
+        Log "Opened PMVC3 1.4.3 Helper"
     } else {
         [System.Windows.Forms.MessageBox]::Show(
             "Helper executable not found at $Pumvc3Helper143Path",
-            "PUMVC3 1.4.3 Helper",
+            "PMVC3 1.4.3 Helper",
             "OK",
             "Warning"
         ) | Out-Null
-        Log "PUMVC3 1.4.3 Helper not found: $Pumvc3Helper143Path"
+        Log "PMVC3 1.4.3 Helper not found: $Pumvc3Helper143Path"
     }
 }
 
@@ -376,7 +376,7 @@ $PsBtn.Add_Click({ Show-AdminPowerShell })
 $Form.Controls.Add($PsBtn)
 
 $Pumvc3InstructionsBtn = New-Object System.Windows.Forms.Button
-$Pumvc3InstructionsBtn.Text      = "PUMVC3 Special Instructions"
+$Pumvc3InstructionsBtn.Text      = "PMVC3 Special Instructions"
 $Pumvc3InstructionsBtn.Font      = New-Object System.Drawing.Font("Segoe UI", 13, [System.Drawing.FontStyle]::Regular)
 $Pumvc3InstructionsBtn.Size      = New-Object System.Drawing.Size(372, 56)
 $Pumvc3InstructionsBtn.Location  = New-Object System.Drawing.Point(44, 288)
@@ -388,7 +388,7 @@ $Pumvc3InstructionsBtn.Add_Click({ Open-Pumvc3SpecialInstructions })
 $Form.Controls.Add($Pumvc3InstructionsBtn)
 
 $Pumvc3Helper120Btn = New-Object System.Windows.Forms.Button
-$Pumvc3Helper120Btn.Text      = "PUMVC3 1.20 Helper"
+$Pumvc3Helper120Btn.Text      = "PMVC3 1.20 Helper"
 $Pumvc3Helper120Btn.Font      = New-Object System.Drawing.Font("Segoe UI", 13, [System.Drawing.FontStyle]::Regular)
 $Pumvc3Helper120Btn.Size      = New-Object System.Drawing.Size(180, 56)
 $Pumvc3Helper120Btn.Location  = New-Object System.Drawing.Point(44, 356)
@@ -400,7 +400,7 @@ $Pumvc3Helper120Btn.Add_Click({ Open-Pumvc3Helper120 })
 $Form.Controls.Add($Pumvc3Helper120Btn)
 
 $Pumvc3Helper143Btn = New-Object System.Windows.Forms.Button
-$Pumvc3Helper143Btn.Text      = "PUMVC3 1.4.3 Helper"
+$Pumvc3Helper143Btn.Text      = "PMVC3 1.4.3 Helper"
 $Pumvc3Helper143Btn.Font      = New-Object System.Drawing.Font("Segoe UI", 13, [System.Drawing.FontStyle]::Regular)
 $Pumvc3Helper143Btn.Size      = New-Object System.Drawing.Size(180, 56)
 $Pumvc3Helper143Btn.Location  = New-Object System.Drawing.Point(236, 356)
