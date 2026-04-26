@@ -21,6 +21,7 @@ $ArmArcadeModeName       = "Arm-ArcadeMode.ps1"
 $CaptureSessionName      = "Capture-Session.ps1"
 $StartRTMPServerName     = "Start-RTMPServer.ps1"
 $LaunchGamePs1Name       = "Launch-Game.ps1"
+$BackgroundImageName     = "background.jpg"
 
 $LaunchGameCmdPath       = Join-Path $ArcadeRoot "Launch-Game.cmd"
 $ExitGameCmdPath         = Join-Path $ArcadeRoot "Exit-Game.cmd"
@@ -89,7 +90,8 @@ $PayloadFiles = @(
     @{ Remote = "arm_arcade_mode.ps1";       Local = $ArmArcadeModeName },
     @{ Remote = "capture_session.ps1";       Local = $CaptureSessionName },
     @{ Remote = "start_rtmp_server.ps1";     Local = $StartRTMPServerName },
-    @{ Remote = "Launch-Game.ps1";           Local = $LaunchGamePs1Name }
+    @{ Remote = "Launch-Game.ps1";           Local = $LaunchGamePs1Name },
+    @{ Remote = "background.jpg";            Local = $BackgroundImageName }
 )
 
 # =============================================================================

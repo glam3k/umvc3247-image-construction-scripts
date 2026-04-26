@@ -43,6 +43,9 @@ That responsibility lives in the separate provisioning/orchestrator repo.
 - [payload/arm_arcade_mode.ps1](/Users/glam3k/projects/umvc3247/images/payload/arm_arcade_mode.ps1)
   Manual arming script used to switch from setup mode to arcade mode.
 
+- `payload/background.jpg`
+  Arcade shell background image staged to `C:\Arcade\background.jpg`.
+
 ## How The Bootstrap Flow Works
 
 The intended entrypoint is a portable PowerShell bootstrap script that can be copied onto a fresh machine and run directly.
@@ -67,6 +70,7 @@ The payload scripts are written to:
 - `C:\Arcade\Launch-ArcadeSession.ps1`
 - `C:\Arcade\ArcadeShell.ps1`
 - `C:\Arcade\Arm-ArcadeMode.ps1`
+- `C:\Arcade\background.jpg`
 
 The payload scripts read settings from:
 
