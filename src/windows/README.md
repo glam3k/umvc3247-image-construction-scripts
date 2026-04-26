@@ -43,6 +43,9 @@ That responsibility lives in the separate provisioning/orchestrator repo.
 - [payload/arm_arcade_mode.ps1](/Users/glam3k/projects/umvc3247/images/payload/arm_arcade_mode.ps1)
   Manual arming script used to switch from setup mode to arcade mode.
 
+- `payload/Prepare-UMVC3-GameFolders.ps1`
+  Manual helper script that copies the Steam UMVC3 install into `C:\Arcade\Games\UMVC3_base`, creates mod folders, hard-links the base files into each mod folder, and applies LZX compression.
+
 - `payload/background.jpg`
   Arcade shell background image staged to `C:\Arcade\background.jpg`.
 
@@ -183,7 +186,8 @@ You must manually:
 
 - install the game
 - verify it launches
-- update `C:\Arcade\Launch-Game.cmd` to launch the real game instead of the placeholder test dialog
+- run `C:\Arcade\Prepare-UMVC3-GameFolders.ps1`
+- place any mod-specific files into the generated folders under `C:\Arcade\Games`
 
 ## Suggested Image Build Process
 
@@ -218,9 +222,10 @@ After bootstrap:
 8. Point Sunshine at the correct display device
 9. Launch Steam and log in
 10. Install the game
-11. Replace `C:\Arcade\Launch-Game.cmd` with the real game launcher
-12. Run `C:\Arcade\Arm-ArcadeMode.ps1`
-13. Reboot into arcade mode
+11. Run `C:\Arcade\Prepare-UMVC3-GameFolders.ps1`
+12. Add your mod-specific files into the generated game folders if needed
+13. Run `C:\Arcade\Arm-ArcadeMode.ps1`
+14. Reboot into arcade mode
 
 ### Phase 3: Arcade Mode Validation
 

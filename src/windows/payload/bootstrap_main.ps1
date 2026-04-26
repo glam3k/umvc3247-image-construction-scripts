@@ -21,6 +21,7 @@ $ArmArcadeModeName       = "Arm-ArcadeMode.ps1"
 $CaptureSessionName      = "Capture-Session.ps1"
 $StartRTMPServerName     = "Start-RTMPServer.ps1"
 $LaunchGamePs1Name       = "Launch-Game.ps1"
+$PrepareGameFoldersName  = "Prepare-UMVC3-GameFolders.ps1"
 $BackgroundImageName     = "background.jpg"
 
 $LaunchGameCmdPath       = Join-Path $ArcadeRoot "Launch-Game.cmd"
@@ -91,6 +92,7 @@ $PayloadFiles = @(
     @{ Remote = "capture_session.ps1";       Local = $CaptureSessionName },
     @{ Remote = "start_rtmp_server.ps1";     Local = $StartRTMPServerName },
     @{ Remote = "Launch-Game.ps1";           Local = $LaunchGamePs1Name },
+    @{ Remote = "Prepare-UMVC3-GameFolders.ps1"; Local = $PrepareGameFoldersName },
     @{ Remote = "background.jpg";            Local = $BackgroundImageName }
 )
 
@@ -874,6 +876,7 @@ try {
     Ensure-GameLaunchCommand
     Ensure-ExitGamePlaceholder
     Ensure-MaintenanceFlag
+    Add-ManualStep "After installing UMVC3 in Steam, run C:\Arcade\Prepare-UMVC3-GameFolders.ps1 to create the base and mod game folders."
     Add-ManualStep "When setup is complete, run C:\Arcade\Arm-ArcadeMode.ps1, then reboot to enter arcade mode."
     Write-BootstrapCompleteMarker
 
