@@ -115,7 +115,7 @@ try {
                 Write-Host "Game absent for $elapsed s. Closing." -ForegroundColor Magenta
                 break
             }
-            Write-Host "Process absent for ${elapsed}s / ${requiredAbsenceSecs}s — waiting for Steam hand-off" -ForegroundColor Gray
+            Write-Host "Process absent for ${elapsed}s / ${requiredAbsenceSecs}s - waiting for Steam hand-off" -ForegroundColor Gray
             Start-Sleep -Seconds 1
         }
     }
