@@ -49,6 +49,7 @@ $CaptureBitrateKbps        = 3000
 $CaptureAudioBitrateKbps   = 128
 $CaptureAudioDevice        = "Voicemeeter Out A2 (VB-Audio Voicemeeter VAIO)"
 $CaptureVideoEncoder       = "h264_nvenc"
+$CaptureUseScaleFilter     = $false
 $CaptureGop                = 60
 $CaptureRtmpUrl            = "rtmp://localhost:1935/arcade"
 
@@ -209,6 +210,7 @@ function Write-ConfigFile {
         capture_audio_bitrate_kbps   = $CaptureAudioBitrateKbps
         capture_audio_device         = $CaptureAudioDevice
         capture_video_encoder        = $CaptureVideoEncoder
+        capture_use_scale_filter     = $CaptureUseScaleFilter
         capture_gop                  = $CaptureGop
         capture_rtmp_url             = $CaptureRtmpUrl
 

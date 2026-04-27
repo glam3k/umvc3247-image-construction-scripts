@@ -62,6 +62,9 @@ if (-not $audioDev) { $audioDev = 'Voicemeeter Out A2 (VB-Audio Voicemeeter VAIO
 $videoEncoder = $config.capture_video_encoder
 if (-not $videoEncoder) { $videoEncoder = 'h264_nvenc' }
 
+$useScaleFilter = $config.capture_use_scale_filter
+if ($null -eq $useScaleFilter) { $useScaleFilter = $false }
+
 $rtmpUrl = $config.capture_rtmp_url
 if (-not $rtmpUrl) { $rtmpUrl = 'rtmp://localhost:1935/arcade' }
 
@@ -71,8 +74,14 @@ $args = @(
     '-video_size', "$resolution",
     '-i', 'desktop',
     '-f', 'dshow',
-    '-i', "audio=$audioDev",
-    '-vf', "scale=$resolution",
+    '-i', "audio=$audioDev"
+)
+
+if ($useScaleFilter) {
+    $args += @('-vf', "scale=$resolution")
+}
+
+$args += @(
     '-c:v', "$videoEncoder",
     '-preset', 'p4',
     '-tune', 'll',
@@ -92,6 +101,7 @@ Write-Info "IMPORTANT: must run in ArcadePlayer console/Sunshine session"
 Write-Info "ffmpeg: $FfmpegPath"
 Write-Info "audio device: $audioDev"
 Write-Info "video encoder: $videoEncoder"
+Write-Info "use scale filter: $useScaleFilter"
 Write-Info "rtmp url: $rtmpUrl"
 Write-Info "args: $($args -join ' ')"
 

@@ -216,14 +216,15 @@ After bootstrap:
 6. Verify Windows microphone privacy is enabled for desktop apps in Settings
 7. Verify audio is working
 8. Verify `capture_video_encoder` in `C:\Arcade\arcade-config.json` is valid for the machine. The default is `h264_nvenc`.
-9. Complete Sunshine first-run setup
-10. Point Sunshine at the correct display device
-11. Launch Steam and log in
-12. Install the game
-13. Run `C:\Arcade\Prepare-UMVC3-GameFolders.ps1`
-14. Add your mod-specific files into the generated game folders if needed
-15. Run `C:\Arcade\Arm-ArcadeMode.ps1`
-16. Reboot into arcade mode
+9. If CPU headroom is tight, keep `capture_use_scale_filter` disabled unless you explicitly need FFmpeg to rescale the capture.
+10. Complete Sunshine first-run setup
+11. Point Sunshine at the correct display device
+12. Launch Steam and log in
+13. Install the game
+14. Run `C:\Arcade\Prepare-UMVC3-GameFolders.ps1`
+15. Add your mod-specific files into the generated game folders if needed
+16. Run `C:\Arcade\Arm-ArcadeMode.ps1`
+17. Reboot into arcade mode
 
 ### Phase 3: Arcade Mode Validation
 
