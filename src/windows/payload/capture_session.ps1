@@ -59,6 +59,9 @@ if (-not $audioBitrate) { $audioBitrate = 128 }
 $audioDev = $config.capture_audio_device
 if (-not $audioDev) { $audioDev = 'Voicemeeter Out A2 (VB-Audio Voicemeeter VAIO)' }
 
+$videoEncoder = $config.capture_video_encoder
+if (-not $videoEncoder) { $videoEncoder = 'h264_nvenc' }
+
 $rtmpUrl = $config.capture_rtmp_url
 if (-not $rtmpUrl) { $rtmpUrl = 'rtmp://localhost:1935/arcade' }
 
@@ -69,9 +72,9 @@ $args = @(
     '-i', 'desktop',
     '-f', 'dshow',
     '-i', "audio=$audioDev",
-    '-vf', "scale=$resolution",
-    '-c:v', 'libx264',
-    '-preset', 'veryfast',
+    '-c:v', "$videoEncoder",
+    '-preset', 'p4',
+    '-tune', 'll',
     '-pix_fmt', 'yuv420p',
     '-b:v', "${bitrateK}k",
     '-maxrate', "${bitrateK}k",
@@ -87,6 +90,7 @@ Write-Info "Starting capture publish"
 Write-Info "IMPORTANT: must run in ArcadePlayer console/Sunshine session"
 Write-Info "ffmpeg: $FfmpegPath"
 Write-Info "audio device: $audioDev"
+Write-Info "video encoder: $videoEncoder"
 Write-Info "rtmp url: $rtmpUrl"
 Write-Info "args: $($args -join ' ')"
 

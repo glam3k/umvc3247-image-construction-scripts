@@ -48,6 +48,7 @@ $CaptureFramerate          = 30
 $CaptureBitrateKbps        = 3000
 $CaptureAudioBitrateKbps   = 128
 $CaptureAudioDevice        = "Voicemeeter Out A2 (VB-Audio Voicemeeter VAIO)"
+$CaptureVideoEncoder       = "h264_nvenc"
 $CaptureGop                = 60
 $CaptureRtmpUrl            = "rtmp://localhost:1935/arcade"
 
@@ -207,6 +208,7 @@ function Write-ConfigFile {
         capture_bitrate_kbps         = $CaptureBitrateKbps
         capture_audio_bitrate_kbps   = $CaptureAudioBitrateKbps
         capture_audio_device         = $CaptureAudioDevice
+        capture_video_encoder        = $CaptureVideoEncoder
         capture_gop                  = $CaptureGop
         capture_rtmp_url             = $CaptureRtmpUrl
 
@@ -871,6 +873,7 @@ try {
     Ensure-MaintenanceFlag
     Add-ManualStep "After installing UMVC3 in Steam, run C:\Arcade\Prepare-UMVC3-GameFolders.ps1 to create the base and mod game folders."
     Add-ManualStep "Verify Windows microphone privacy is enabled for desktop apps in Settings. If capture fails, manually turn on 'Allow apps to access your microphone' and 'Allow desktop apps to access your microphone'."
+    Add-ManualStep "Verify capture_video_encoder in C:\Arcade\arcade-config.json is supported on this machine. Default is h264_nvenc and may need to be changed on non-NVIDIA systems."
     Add-ManualStep "When setup is complete, run C:\Arcade\Arm-ArcadeMode.ps1, then reboot to enter arcade mode."
     Write-BootstrapCompleteMarker
 
