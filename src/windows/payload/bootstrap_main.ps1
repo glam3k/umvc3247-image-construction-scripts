@@ -351,6 +351,77 @@ function Ensure-StreamingPackages {
     if ($Config.install_ffmpeg)   { Ensure-ChocoPackage -PackageName "ffmpeg" }
 }
 
+function Ensure-FirewallRule {
+    param(
+        [Parameter(Mandatory = $true)][string]$DisplayName,
+        [Parameter(Mandatory = $true)][ValidateSet("TCP","UDP")] [string]$Protocol,
+        [Parameter(Mandatory = $true)][string]$LocalPorts,
+        [string]$Description = ""
+    )
+
+    $existing = Get-NetFirewallRule -DisplayName $DisplayName -ErrorAction SilentlyContinue
+    if ($existing) {
+        Write-Info "Firewall rule already present: $DisplayName"
+        return
+    }
+
+    New-NetFirewallRule `
+        -DisplayName $DisplayName `
+        -Direction Inbound `
+        -Action Allow `
+        -Enabled True `
+        -Profile Any `
+        -Protocol $Protocol `
+        -LocalPort $LocalPorts `
+        -Description $Description | Out-Null
+
+    Write-Info "Created firewall rule $DisplayName ($Protocol $LocalPorts)"
+}
+
+function Ensure-StreamingFirewallRules {
+    param($Config)
+
+    if ($Config.install_sunshine) {
+        Ensure-FirewallRule `
+            -DisplayName "Sunshine HTTPS" `
+            -Protocol "TCP" `
+            -LocalPorts "47984" `
+            -Description "Sunshine HTTPS pairing/service port"
+
+        Ensure-FirewallRule `
+            -DisplayName "Sunshine HTTP" `
+            -Protocol "TCP" `
+            -LocalPorts "47989" `
+            -Description "Sunshine HTTP service port"
+
+        Ensure-FirewallRule `
+            -DisplayName "Sunshine Web UI" `
+            -Protocol "TCP" `
+            -LocalPorts "47990" `
+            -Description "Sunshine web UI port"
+
+        Ensure-FirewallRule `
+            -DisplayName "Sunshine RTSP" `
+            -Protocol "TCP" `
+            -LocalPorts "48010" `
+            -Description "Sunshine RTSP port"
+
+        Ensure-FirewallRule `
+            -DisplayName "Sunshine Stream UDP" `
+            -Protocol "UDP" `
+            -LocalPorts "47998-48000,48002" `
+            -Description "Sunshine video, control, audio, and mic UDP ports"
+    }
+
+    if ($Config.install_mediamtx -or $Config.enable_rtmp_task -or $Config.capture_enabled) {
+        Ensure-FirewallRule `
+            -DisplayName "Arcade RTMP Ingest" `
+            -Protocol "TCP" `
+            -LocalPorts "1935" `
+            -Description "MediaMTX RTMP ingest port for local or remote FFmpeg publishers"
+    }
+}
+
 function Check-NvidiaDriver {
     try {
         $nvidiaSmi = Get-NvidiaSmiPath
@@ -861,6 +932,7 @@ try {
     Ensure-Chocolatey
     Ensure-GamePackages -Config $Config
     Ensure-StreamingPackages -Config $Config
+    Ensure-StreamingFirewallRules -Config $Config
     Ensure-MediaMTX -Config $Config
     Ensure-GameUser -Config $Config
     Ensure-GameUserProfile -Config $Config

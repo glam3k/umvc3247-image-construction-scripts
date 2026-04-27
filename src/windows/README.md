@@ -106,6 +106,8 @@ The main bootstrap currently handles:
 - installing Steam and Sunshine
 - installing `ffmpeg` via Chocolatey
 - staging MediaMTX under `C:\Arcade`
+- opening Windows Firewall inbound rules for Sunshine default ports
+- opening Windows Firewall inbound rule for RTMP on `1935/TCP`
 - downloading/extracting/installing pinned ViGEmBus `v1.22.0` with the Windows Server workaround path
 - enabling microphone access machine-wide and for both the current admin user and the arcade user
 - staging the VDD control package under `C:\Arcade\VirtualDisplayDriver`
@@ -218,13 +220,14 @@ After bootstrap:
 8. Verify `capture_video_encoder` in `C:\Arcade\arcade-config.json` is valid for the machine. The default is `h264_nvenc`.
 9. If CPU headroom is tight, keep `capture_use_scale_filter` disabled unless you explicitly need FFmpeg to rescale the capture.
 10. Complete Sunshine first-run setup
-11. Point Sunshine at the correct display device
-12. Launch Steam and log in
-13. Install the game
-14. Run `C:\Arcade\Prepare-UMVC3-GameFolders.ps1`
-15. Add your mod-specific files into the generated game folders if needed
-16. Run `C:\Arcade\Arm-ArcadeMode.ps1`
-17. Reboot into arcade mode
+11. Verify the Windows Firewall rules created by bootstrap are present for Sunshine and RTMP
+12. Point Sunshine at the correct display device
+13. Launch Steam and log in
+14. Install the game
+15. Run `C:\Arcade\Prepare-UMVC3-GameFolders.ps1`
+16. Add your mod-specific files into the generated game folders if needed
+17. Run `C:\Arcade\Arm-ArcadeMode.ps1`
+18. Reboot into arcade mode
 
 ### Phase 3: Arcade Mode Validation
 
@@ -240,6 +243,7 @@ C:\Arcade\Arm-ArcadeMode.ps1
 3. Validate that:
    - `ArcadePlayer` autologs in
    - Sunshine starts
+   - the Windows Firewall Sunshine and RTMP rules exist
    - Steam starts
    - the arcade shell appears
    - the game launches from `Launch-Game.cmd`
