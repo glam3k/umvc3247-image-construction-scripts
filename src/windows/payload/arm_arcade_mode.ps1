@@ -48,7 +48,6 @@ try {
 
 New-Item -Path $ArcadeEnabledFlag -ItemType File -Force | Out-Null
 Remove-Item $MaintenanceFlag -ErrorAction SilentlyContinue
-Enable-ScheduledTask -TaskName "ArcadeRuntimeTask" | Out-Null
 
 Write-Host "[ARCADE] Arcade mode armed"
 Write-Host "[ARCADE] Ensure C:\Arcade\Launch-Game.cmd uses 'start /wait' so game exit is detected"

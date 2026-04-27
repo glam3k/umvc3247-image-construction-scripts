@@ -31,9 +31,6 @@ That responsibility lives in the separate provisioning/orchestrator repo.
 - `payload/bootstrap_main.ps1`
   Portable Windows bootstrap entrypoint. Copy this script onto a fresh Windows machine, edit the config block at the top if needed, and run it as Administrator.
 
-- [payload/start_arcade_mode.ps1](/Users/glam3k/projects/umvc3247/images/payload/start_arcade_mode.ps1)
-  Machine-level watchdog script.
-
 - [payload/launch_arcade_session.ps1](/Users/glam3k/projects/umvc3247/images/payload/launch_arcade_session.ps1)
   Arcade user logon/session setup script.
 
@@ -69,7 +66,6 @@ It does the following:
 The payload scripts are written to:
 
 - `C:\Arcade\Bootstrap-Main.ps1`
-- `C:\Arcade\Start-ArcadeMode.ps1`
 - `C:\Arcade\Launch-ArcadeSession.ps1`
 - `C:\Arcade\ArcadeShell.ps1`
 - `C:\Arcade\Arm-ArcadeMode.ps1`
@@ -116,7 +112,7 @@ The main bootstrap currently handles:
 - staging the Voicemeeter zip under `C:\Arcade\Voicemeeter`
 - staging the VB-Cable zip under `C:\Arcade\VBCable`
 - creating the arcade user
-- registering the startup/logon tasks used by the kiosk flow
+- registering the logon tasks used by the kiosk flow
 - creating a placeholder `C:\Arcade\Launch-Game.cmd`
 - writing `C:\Arcade\manual-steps.txt`
 - writing `C:\Arcade\bootstrap.complete`

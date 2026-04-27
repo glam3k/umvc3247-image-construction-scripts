@@ -14,7 +14,6 @@ $ChocoExe          = "C:\ProgramData\chocolatey\bin\choco.exe"
 
 # Runtime artifact names under C:\Arcade
 $BootstrapPs1Name        = "bootstrap.ps1"
-$StartArcadeModeName     = "Start-ArcadeMode.ps1"
 $LaunchArcadeSessionName = "Launch-ArcadeSession.ps1"
 $ArcadeShellName         = "ArcadeShell.ps1"
 $ArmArcadeModeName       = "Arm-ArcadeMode.ps1"
@@ -85,7 +84,6 @@ $VBCableZipUrl     = "https://download.vb-audio.com/Download_CABLE/VBCABLE_Drive
 # =============================================================================
 
 $PayloadFiles = @(
-    @{ Remote = "start_arcade_mode.ps1";     Local = $StartArcadeModeName },
     @{ Remote = "launch_arcade_session.ps1"; Local = $LaunchArcadeSessionName },
     @{ Remote = "arcade_shell.ps1";          Local = $ArcadeShellName },
     @{ Remote = "arm_arcade_mode.ps1";       Local = $ArmArcadeModeName },
@@ -771,11 +769,6 @@ function Ensure-ScheduledTaskEx {
 
 function Ensure-ScheduledTasks {
     param($Config)
-
-    Ensure-ScheduledTaskEx -TaskName "ArcadeRuntimeTask" `
-        -ScriptPath (Join-Path $ArcadeRoot $StartArcadeModeName) `
-        -TriggerMode "Startup" `
-        -Enabled $false
 
     Ensure-ScheduledTaskEx -TaskName "ArcadeRTMPTask" `
         -ScriptPath (Join-Path $ArcadeRoot $StartRTMPServerName) `
