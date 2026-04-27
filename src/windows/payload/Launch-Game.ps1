@@ -77,7 +77,10 @@ function Ensure-SteamGameJunction {
     if (Test-Path -LiteralPath $SteamGameDir) {
         if (Test-IsJunction -Path $SteamGameDir) {
             Write-Host "Removing existing UMVC3 junction..." -ForegroundColor Yellow
-            Remove-Item -LiteralPath $SteamGameDir -Force
+            $removeOutput = cmd /c rmdir "$SteamGameDir" 2>&1
+            if ($LASTEXITCODE -ne 0) {
+                Fail-Step "Failed removing existing UMVC3 junction. Output: $removeOutput"
+            }
         } else {
             $backupPath = Get-UniqueBackupPath -BasePath $SteamGameDir
             Write-Host "Steam UMVC3 path is a real directory; moving it to $backupPath before first junction swap..." -ForegroundColor Yellow
