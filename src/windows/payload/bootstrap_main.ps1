@@ -407,10 +407,16 @@ function Ensure-StreamingFirewallRules {
             -Description "Sunshine RTSP port"
 
         Ensure-FirewallRule `
-            -DisplayName "Sunshine Stream UDP" `
+            -DisplayName "Sunshine Stream UDP Range" `
             -Protocol "UDP" `
-            -LocalPorts "47998-48000,48002" `
-            -Description "Sunshine video, control, audio, and mic UDP ports"
+            -LocalPorts "47998-48000" `
+            -Description "Sunshine UDP video, control, and audio port range"
+
+        Ensure-FirewallRule `
+            -DisplayName "Sunshine Stream UDP Mic" `
+            -Protocol "UDP" `
+            -LocalPorts "48002" `
+            -Description "Sunshine UDP microphone port"
     }
 
     if ($Config.install_mediamtx -or $Config.enable_rtmp_task -or $Config.capture_enabled) {
