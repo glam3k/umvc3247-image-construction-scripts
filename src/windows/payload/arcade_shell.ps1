@@ -107,7 +107,7 @@ function Start-Game {
     }
     Log "Launching game"
     $Form.SendToBack()
-    Start-Process -FilePath "cmd.exe" -ArgumentList "/c `"$LaunchGamePath`""
+    Start-Process -FilePath "cmd.exe" -ArgumentList "/c `"$LaunchGamePath`"" -WindowStyle Hidden
     # Button state follows the flag file; poller will flip to EXIT GAME when game.running appears
 }
 
@@ -117,7 +117,7 @@ function Stop-Game {
         return
     }
     Log "Exiting game"
-    Start-Process -FilePath "cmd.exe" -ArgumentList "/c `"$ExitGamePath`""
+    Start-Process -FilePath "cmd.exe" -ArgumentList "/c `"$ExitGamePath`"" -WindowStyle Hidden
     # Button state follows the flag file; poller will flip to LAUNCH GAME when game.running disappears
 }
 
