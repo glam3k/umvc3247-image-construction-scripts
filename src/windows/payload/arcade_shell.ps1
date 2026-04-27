@@ -355,10 +355,11 @@ $Form.Controls.Add($RecenterBtn)
 
 $AdminBtn = New-Object System.Windows.Forms.Button
 $AdminBtn.Text      = "Admin Exit"
-$AdminBtn.Font      = New-Object System.Drawing.Font("Segoe UI", 9, [System.Drawing.FontStyle]::Regular)
-$AdminBtn.Size      = New-Object System.Drawing.Size(100, 28)
-$AdminBtn.BackColor = [System.Drawing.Color]::FromArgb(30, 30, 30)
-$AdminBtn.ForeColor = [System.Drawing.Color]::FromArgb(100, 100, 100)
+$AdminBtn.Font      = New-Object System.Drawing.Font("Segoe UI", 11, [System.Drawing.FontStyle]::Regular)
+$AdminBtn.Size      = New-Object System.Drawing.Size(180, 44)
+$AdminBtn.Location  = New-Object System.Drawing.Point(44, 424)
+$AdminBtn.BackColor = [System.Drawing.Color]::FromArgb(66, 66, 66)
+$AdminBtn.ForeColor = [System.Drawing.Color]::White
 $AdminBtn.FlatStyle = [System.Windows.Forms.FlatStyle]::Flat
 $AdminBtn.FlatAppearance.BorderSize = 0
 $AdminBtn.Add_Click({ Show-AdminExit })
@@ -366,10 +367,11 @@ $Form.Controls.Add($AdminBtn)
 
 $PsBtn = New-Object System.Windows.Forms.Button
 $PsBtn.Text      = "PowerShell"
-$PsBtn.Font      = New-Object System.Drawing.Font("Segoe UI", 9, [System.Drawing.FontStyle]::Regular)
-$PsBtn.Size      = New-Object System.Drawing.Size(100, 28)
-$PsBtn.BackColor = [System.Drawing.Color]::FromArgb(30, 30, 30)
-$PsBtn.ForeColor = [System.Drawing.Color]::FromArgb(100, 100, 100)
+$PsBtn.Font      = New-Object System.Drawing.Font("Segoe UI", 11, [System.Drawing.FontStyle]::Regular)
+$PsBtn.Size      = New-Object System.Drawing.Size(180, 44)
+$PsBtn.Location  = New-Object System.Drawing.Point(236, 424)
+$PsBtn.BackColor = [System.Drawing.Color]::FromArgb(66, 66, 66)
+$PsBtn.ForeColor = [System.Drawing.Color]::White
 $PsBtn.FlatStyle = [System.Windows.Forms.FlatStyle]::Flat
 $PsBtn.FlatAppearance.BorderSize = 0
 $PsBtn.Add_Click({ Show-AdminPowerShell })
@@ -435,9 +437,6 @@ $GameStateTimer.Add_Tick({
 
 # -- Events --
 $Form.Add_Shown({
-    $h = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds.Height
-    $AdminBtn.Location = New-Object System.Drawing.Point(16, ($h - 46))
-    $PsBtn.Location    = New-Object System.Drawing.Point(124, ($h - 46))
     # Clear stale flag from a previous crash/reboot
     Remove-Item $GameFlagPath -ErrorAction SilentlyContinue
     Update-Heartbeat
