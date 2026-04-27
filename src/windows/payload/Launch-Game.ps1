@@ -36,6 +36,70 @@ public class Win32GameFocus {
 }
 "@
 
+function Fail-Step {
+    param([string]$Message)
+    throw $Message
+}
+
+function Test-IsJunction {
+    param([string]$Path)
+
+    if (-not (Test-Path -LiteralPath $Path)) {
+        return $false
+    }
+
+    $item = Get-Item -LiteralPath $Path -Force
+    return [bool]($item.Attributes -band [IO.FileAttributes]::ReparsePoint)
+}
+
+function Get-UniqueBackupPath {
+    param([string]$BasePath)
+
+    $candidate = "${BasePath}.original"
+    $suffix = 0
+    while (Test-Path -LiteralPath $candidate) {
+        $suffix++
+        $candidate = "${BasePath}.original.${suffix}"
+    }
+    return $candidate
+}
+
+function Ensure-SteamGameJunction {
+    param(
+        [string]$SteamGameDir,
+        [string]$SelectedFolder
+    )
+
+    if (-not (Test-Path -LiteralPath $SelectedFolder)) {
+        Fail-Step "Selected game folder does not exist: $SelectedFolder"
+    }
+
+    if (Test-Path -LiteralPath $SteamGameDir) {
+        if (Test-IsJunction -Path $SteamGameDir) {
+            Write-Host "Removing existing UMVC3 junction..." -ForegroundColor Yellow
+            Remove-Item -LiteralPath $SteamGameDir -Force
+        } else {
+            $backupPath = Get-UniqueBackupPath -BasePath $SteamGameDir
+            Write-Host "Steam UMVC3 path is a real directory; moving it to $backupPath before first junction swap..." -ForegroundColor Yellow
+            Move-Item -LiteralPath $SteamGameDir -Destination $backupPath
+        }
+    }
+
+    if (Test-Path -LiteralPath $SteamGameDir) {
+        Fail-Step "Steam UMVC3 path still exists after removal attempt: $SteamGameDir"
+    }
+
+    Write-Host "Creating junction: $SteamGameDir -> $SelectedFolder" -ForegroundColor Cyan
+    $mklinkOutput = cmd /c mklink /J "$SteamGameDir" "$SelectedFolder" 2>&1
+    if ($LASTEXITCODE -ne 0) {
+        Fail-Step "mklink /J failed with exit code $LASTEXITCODE. Output: $mklinkOutput"
+    }
+
+    if (-not (Test-IsJunction -Path $SteamGameDir)) {
+        Fail-Step "Expected Steam UMVC3 path to become a junction, but it did not: $SteamGameDir"
+    }
+}
+
 # --- 1. KILL STEAM (unlock files for junction swap) ---
 if (Get-Process "Steam" -ErrorAction SilentlyContinue) {
     Stop-Process -Name "Steam" -Force
@@ -60,8 +124,7 @@ $form.ShowDialog() | Out-Null
 if (-not $script:selectedFolder) { exit 1 }
 
 # --- 3. JUNCTION SWAP ---
-if (Test-Path $steamGameDir) { cmd /c rmdir "$steamGameDir" }
-cmd /c mklink /J "$steamGameDir" "$script:selectedFolder"
+Ensure-SteamGameJunction -SteamGameDir $steamGameDir -SelectedFolder $script:selectedFolder
 
 # --- 4. LAUNCH AND MONITOR ---
 New-Item -Path $markerFile -ItemType File -Force | Out-Null
