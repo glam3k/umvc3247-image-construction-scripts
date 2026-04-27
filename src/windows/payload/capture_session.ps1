@@ -72,6 +72,7 @@ $args = @(
     '-i', 'desktop',
     '-f', 'dshow',
     '-i', "audio=$audioDev",
+    '-vf', "scale=$resolution",
     '-c:v', "$videoEncoder",
     '-preset', 'p4',
     '-tune', 'll',
