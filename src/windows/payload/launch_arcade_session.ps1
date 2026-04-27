@@ -4,7 +4,9 @@ $ShellScriptPath = "C:\Arcade\ArcadeShell.ps1"
 $Log             = "C:\Arcade\arcade-session.log"
 $VoicemeeterCandidates = @(
     "C:\Program Files (x86)\VB\Voicemeeter\voicemeeter8.exe",
-    "C:\Program Files (x86)\VB\Voicemeeter\voicemeeter.exe"
+    "C:\Program Files (x86)\VB\Voicemeeter\voicemeeter.exe",
+    "C:\Arcade\Voicemeeter\extracted\voicemeeter8.exe",
+    "C:\Arcade\Voicemeeter\extracted\voicemeeter.exe"
 )
 
 function Log($msg) {
