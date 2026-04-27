@@ -870,6 +870,7 @@ try {
     Ensure-ExitGamePlaceholder
     Ensure-MaintenanceFlag
     Add-ManualStep "After installing UMVC3 in Steam, run C:\Arcade\Prepare-UMVC3-GameFolders.ps1 to create the base and mod game folders."
+    Add-ManualStep "Verify Windows microphone privacy is enabled for desktop apps in Settings. If capture fails, manually turn on 'Allow apps to access your microphone' and 'Allow desktop apps to access your microphone'."
     Add-ManualStep "When setup is complete, run C:\Arcade\Arm-ArcadeMode.ps1, then reboot to enter arcade mode."
     Write-BootstrapCompleteMarker
 
