@@ -11,6 +11,8 @@ $Log             = "C:\Arcade\arcade-shell.log"
 
 $Pumvc3SpecialInstructionsPath = "C:\Arcade\pmvc3_special_instructions.txt"
 $Pumvc3RootPath                = "C:\Arcade\Games\Umvc3_PMVC3"
+$Pumvc3Helper120Path           = Join-Path $Pumvc3RootPath "PMVC3_Beta-1.2.0.exe"
+$Pumvc3Helper143Path           = Join-Path $Pumvc3RootPath "PMVC3_Beta-1.4.3.exe"
 
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
@@ -244,68 +246,33 @@ function Open-Pumvc3SpecialInstructions {
     }
 }
 
-function Find-Pumvc3HelperExe {
-    param(
-        [Parameter(Mandatory = $true)][string[]]$Patterns
-    )
-
-    if (-not (Test-Path $Pumvc3RootPath)) {
-        return $null
-    }
-
-    foreach ($pattern in $Patterns) {
-        $match = Get-ChildItem -Path $Pumvc3RootPath -Recurse -File -Filter "*.exe" -ErrorAction SilentlyContinue |
-            Where-Object { $_.Name -like $pattern } |
-            Select-Object -First 1
-        if ($match) {
-            return $match.FullName
-        }
-    }
-
-    return $null
-}
-
 function Open-Pumvc3Helper120 {
-    $helperPath = Find-Pumvc3HelperExe -Patterns @(
-        "*1.20*helper*.exe",
-        "*120*helper*.exe",
-        "*helper*1.20*.exe",
-        "*helper*120*.exe"
-    )
-
-    if ($helperPath) {
-        Start-Process -FilePath $helperPath
-        Log "Opened PMVC3 1.20 Helper: $helperPath"
+    if (Test-Path $Pumvc3Helper120Path) {
+        Start-Process -FilePath $Pumvc3Helper120Path
+        Log "Opened PMVC3 1.20 Helper: $Pumvc3Helper120Path"
     } else {
         [System.Windows.Forms.MessageBox]::Show(
-            "PMVC3 1.20 helper executable not found under $Pumvc3RootPath",
+            "PMVC3 1.20 helper executable not found at $Pumvc3Helper120Path",
             "PMVC3 1.20 Helper",
             "OK",
             "Warning"
         ) | Out-Null
-        Log "PMVC3 1.20 Helper not found under $Pumvc3RootPath"
+        Log "PMVC3 1.20 Helper not found: $Pumvc3Helper120Path"
     }
 }
 
 function Open-Pumvc3Helper143 {
-    $helperPath = Find-Pumvc3HelperExe -Patterns @(
-        "*1.4.3*helper*.exe",
-        "*143*helper*.exe",
-        "*helper*1.4.3*.exe",
-        "*helper*143*.exe"
-    )
-
-    if ($helperPath) {
-        Start-Process -FilePath $helperPath
-        Log "Opened PMVC3 1.4.3 Helper: $helperPath"
+    if (Test-Path $Pumvc3Helper143Path) {
+        Start-Process -FilePath $Pumvc3Helper143Path
+        Log "Opened PMVC3 1.4.3 Helper: $Pumvc3Helper143Path"
     } else {
         [System.Windows.Forms.MessageBox]::Show(
-            "PMVC3 1.4.3 helper executable not found under $Pumvc3RootPath",
+            "PMVC3 1.4.3 helper executable not found at $Pumvc3Helper143Path",
             "PMVC3 1.4.3 Helper",
             "OK",
             "Warning"
         ) | Out-Null
-        Log "PMVC3 1.4.3 Helper not found under $Pumvc3RootPath"
+        Log "PMVC3 1.4.3 Helper not found: $Pumvc3Helper143Path"
     }
 }
 
