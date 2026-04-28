@@ -1,11 +1,22 @@
 $ErrorActionPreference = 'Stop'
 
-$obsPath = "C:\Program Files\obs-studio\bin\64bit\obs64.exe"
+$obsDir = "C:\Program Files\obs-studio\bin\64bit"
+$obsExe = Join-Path $obsDir "obs64.exe"
 
-Write-Output "[CAPTURE] Restarting OBS streaming session..."
+Write-Output "[CAPTURE] Starting OBS..."
+
+if (-not (Test-Path $obsExe)) {
+    Write-Error "OBS not found at $obsExe"
+    exit 1
+}
 
 Get-Process obs64 -ErrorAction SilentlyContinue | Stop-Process -Force
 
-Start-Sleep -Seconds 5
+Start-Sleep -Seconds 3
 
-Start-Process $obsPath -ArgumentList "--startstreaming --minimize-to-tray"
+Start-Process `
+  -FilePath $obsExe `
+  -WorkingDirectory $obsDir `
+  -ArgumentList "--startstreaming --minimize-to-tray"
+
+Write-Output "[CAPTURE] OBS launched"
