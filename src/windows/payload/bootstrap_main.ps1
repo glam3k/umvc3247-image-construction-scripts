@@ -851,17 +851,19 @@ function Ensure-ScheduledTaskEx {
 function Ensure-ScheduledTasks {
     param($Config)
 
+    $streamingEnabled = [bool]$Config.capture_enabled
+
     Ensure-ScheduledTaskEx -TaskName "ArcadeRTMPTask" `
         -ScriptPath (Join-Path $ArcadeRoot $StartRTMPServerName) `
         -TriggerMode "LogOn" `
         -UserId $Config.game_user `
-        -Enabled ([bool]$Config.enable_rtmp_task)
+        -Enabled ($streamingEnabled -and [bool]$Config.enable_rtmp_task)
 
     Ensure-ScheduledTaskEx -TaskName "ArcadeCaptureTask" `
         -ScriptPath (Join-Path $ArcadeRoot $CaptureSessionName) `
         -TriggerMode "LogOn" `
         -UserId $Config.game_user `
-        -Enabled ([bool]$Config.enable_capture_task)
+        -Enabled ($streamingEnabled -and [bool]$Config.enable_capture_task)
 }
 
 function Ensure-GameLaunchCommand {

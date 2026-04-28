@@ -8,7 +8,8 @@ $ErrorActionPreference = 'Stop'
 
 $ArcadeRoot = 'C:\Arcade'
 $ExePath    = Join-Path $ArcadeRoot 'mediamtx.exe'
-$ConfigPath = Join-Path $ArcadeRoot 'mediamtx.yml'
+$ConfigPath = Join-Path $ArcadeRoot 'arcade-config.json'
+$MediaMTXConfigPath = Join-Path $ArcadeRoot 'mediamtx.yml'
 $LogPath    = Join-Path $ArcadeRoot 'mediamtx.log'
 $ErrLogPath = Join-Path $ArcadeRoot 'mediamtx-error.log'
 
@@ -26,7 +27,23 @@ if (-not (Test-Path $ExePath)) {
 }
 
 if (-not (Test-Path $ConfigPath)) {
-    Fail "[RTMP] mediamtx.yml not found at $ConfigPath"
+    Fail "[RTMP] arcade-config.json not found at $ConfigPath"
+}
+
+if (-not (Test-Path $MediaMTXConfigPath)) {
+    Fail "[RTMP] mediamtx.yml not found at $MediaMTXConfigPath"
+}
+
+try {
+    $Config = Get-Content $ConfigPath -Raw | ConvertFrom-Json
+}
+catch {
+    Fail "[RTMP] Failed to parse arcade config - $($_.Exception.Message)"
+}
+
+if (-not ($Config.PSObject.Properties.Name -contains 'capture_enabled') -or -not [bool]$Config.capture_enabled) {
+    Write-Info "capture_enabled is false; skipping MediaMTX startup"
+    exit 0
 }
 
 try {
@@ -45,11 +62,11 @@ if ($existing) {
 
 # IMPORTANT: mediamtx expects the config path as a positional argument,
 # not "-c <path>".
-$argList = @($ConfigPath)
+$argList = @($MediaMTXConfigPath)
 
 Write-Info "Starting MediaMTX"
 Write-Info "Exe: $ExePath"
-Write-Info "Config: $ConfigPath"
+Write-Info "Config: $MediaMTXConfigPath"
 
 try {
     $proc = Start-Process `
