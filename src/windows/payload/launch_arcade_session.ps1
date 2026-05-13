@@ -68,7 +68,7 @@ function Ensure-Voicemeeter {
 
     try {
         Log "Starting Voicemeeter..."
-        Start-Process -FilePath $candidate -ArgumentList "-Hidden"
+        Start-Process -FilePath $candidate -WindowStyle Minimized
 
         $timeout = 15
         while (!(Get-Process -Name "voicemeeter8", "voicemeeter" -ErrorAction SilentlyContinue) -and $timeout -gt 0) {
