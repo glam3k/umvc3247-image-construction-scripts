@@ -55,9 +55,12 @@ function Ensure-Steam {
 }
 
 function Ensure-Voicemeeter {
-    if (Get-Process -Name "voicemeeter8", "voicemeeter" -ErrorAction SilentlyContinue) {
-        Log "Voicemeeter already running"
-        return
+    # If an auto-started instance is already running, kill it first so we can restart it hidden.
+    $existing = Get-Process -Name "voicemeeter8", "voicemeeter" -ErrorAction SilentlyContinue
+    if ($existing) {
+        Log "Stopping existing Voicemeeter process to restart hidden..."
+        $existing | Stop-Process -Force -ErrorAction SilentlyContinue
+        Start-Sleep -Seconds 2
     }
 
     $candidate = $VoicemeeterCandidates | Where-Object { Test-Path $_ } | Select-Object -First 1
@@ -68,7 +71,7 @@ function Ensure-Voicemeeter {
 
     try {
         Log "Starting Voicemeeter..."
-        Start-Process -FilePath $candidate -WindowStyle Minimized
+        Start-Process -FilePath $candidate -WindowStyle Hidden
 
         $timeout = 15
         while (!(Get-Process -Name "voicemeeter8", "voicemeeter" -ErrorAction SilentlyContinue) -and $timeout -gt 0) {
