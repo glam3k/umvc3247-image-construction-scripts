@@ -2,12 +2,6 @@ $ErrorActionPreference = "Continue"
 
 $ShellScriptPath = "C:\Arcade\ArcadeShell.ps1"
 $Log             = "C:\Arcade\arcade-session.log"
-$VoicemeeterCandidates = @(
-    "C:\Program Files (x86)\VB\Voicemeeter\voicemeeter8.exe",
-    "C:\Program Files (x86)\VB\Voicemeeter\voicemeeter.exe",
-    "C:\Arcade\Voicemeeter\extracted\voicemeeter8.exe",
-    "C:\Arcade\Voicemeeter\extracted\voicemeeter.exe"
-)
 
 function Log($msg) {
     Add-Content -Path $Log -Value ("[{0}] {1}" -f (Get-Date), $msg)
@@ -54,44 +48,8 @@ function Ensure-Steam {
     Log "Steam executable not found"
 }
 
-function Ensure-Voicemeeter {
-    # If an auto-started instance is already running, kill it first so we can restart it hidden.
-    $existing = Get-Process -Name "voicemeeter8", "voicemeeter" -ErrorAction SilentlyContinue
-    if ($existing) {
-        Log "Stopping existing Voicemeeter process to restart hidden..."
-        $existing | Stop-Process -Force -ErrorAction SilentlyContinue
-        Start-Sleep -Seconds 2
-    }
-
-    $candidate = $VoicemeeterCandidates | Where-Object { Test-Path $_ } | Select-Object -First 1
-    if (-not $candidate) {
-        Log "Voicemeeter executable not found"
-        return
-    }
-
-    try {
-        Log "Starting Voicemeeter..."
-        Start-Process -FilePath $candidate -WindowStyle Hidden
-
-        $timeout = 15
-        while (!(Get-Process -Name "voicemeeter8", "voicemeeter" -ErrorAction SilentlyContinue) -and $timeout -gt 0) {
-            Start-Sleep -Seconds 1
-            $timeout--
-        }
-
-        if (Get-Process -Name "voicemeeter8", "voicemeeter" -ErrorAction SilentlyContinue) {
-            Log "Voicemeeter started"
-        } else {
-            Log "Voicemeeter did not appear after launch attempt"
-        }
-    } catch {
-        Log "Failed to start Voicemeeter: $($_.Exception.Message)"
-    }
-}
-
 Log "Arcade session starting"
 Set-KioskPolicy
-Ensure-Voicemeeter
 Ensure-Steam
 
 # Remove any stale game.running flag left by a crash or hard reboot
