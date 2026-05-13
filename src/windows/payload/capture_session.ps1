@@ -43,11 +43,11 @@ $sentinelFile = Join-Path $obsAppData '.sentinel'
 
 if (Test-Path $safeModeDir) {
     Write-Output "[CAPTURE] Removing OBS safe_mode directory..."
-    cmd /c "rd /s /q ""$safeModeDir\"""
+    cmd /c "rd /s /q `"$safeModeDir`""
 }
 if (Test-Path $sentinelFile) {
     Write-Output "[CAPTURE] Removing OBS .sentinel file..."
-    Remove-Item -Path $sentinelFile -Force -ErrorAction SilentlyContinue
+    cmd /c "rd /s /q `"$sentinelFile`""
 }
 
 Start-Process `
