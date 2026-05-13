@@ -35,6 +35,21 @@ Get-Process obs64 -ErrorAction SilentlyContinue | Stop-Process -Force
 
 Start-Sleep -Seconds 3
 
+# Clean up OBS safe-mode artifacts that can cause OBS to get stuck in safe mode
+# on restart (see: https://www.reddit.com/r/obs/comments/1ff3teb/)
+$obsAppData = Join-Path $env:APPDATA 'obs-studio'
+$safeModeDir = Join-Path $obsAppData 'safe_mode'
+$sentinelFile = Join-Path $obsAppData '.sentinel'
+
+if (Test-Path $safeModeDir) {
+    Write-Output "[CAPTURE] Removing OBS safe_mode directory..."
+    Remove-Item -Path $safeModeDir -Recurse -Force -ErrorAction SilentlyContinue
+}
+if (Test-Path $sentinelFile) {
+    Write-Output "[CAPTURE] Removing OBS .sentinel file..."
+    Remove-Item -Path $sentinelFile -Force -ErrorAction SilentlyContinue
+}
+
 Start-Process `
   -FilePath $obsExe `
   -WorkingDirectory $obsDir `
