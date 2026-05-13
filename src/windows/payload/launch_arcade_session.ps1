@@ -2,6 +2,10 @@ $ErrorActionPreference = "Continue"
 
 $ShellScriptPath = "C:\Arcade\ArcadeShell.ps1"
 $Log             = "C:\Arcade\arcade-session.log"
+$VoicemeeterCandidates = @(
+    "C:\Program Files (x86)\VB\Voicemeeter\voicemeeter8.exe",
+    "C:\Program Files (x86)\VB\Voicemeeter\voicemeeter.exe"
+)
 
 function Log($msg) {
     Add-Content -Path $Log -Value ("[{0}] {1}" -f (Get-Date), $msg)
@@ -19,6 +23,58 @@ function Set-KioskPolicy {
     # Suppress Win key and Run dialog
     Set-ItemProperty -Path $exp -Name NoWinKeys             -Value 1 -Type DWord -Force
     Set-ItemProperty -Path $exp -Name NoRun                 -Value 1 -Type DWord -Force
+}
+
+Add-Type @"
+using System;
+using System.Runtime.InteropServices;
+public class Win32 {
+    [DllImport("user32.dll")]
+    public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+    [DllImport("user32.dll")]
+    public static extern bool SetForegroundWindow(IntPtr hWnd);
+    public const int SW_HIDE = 0;
+}
+"@
+
+function Ensure-Voicemeeter {
+    # Voicemeeter may already be running from a previous session or auto-start.
+    # If so, we leave it alone (audio engine is already active).
+    if (Get-Process -Name "voicemeeter8", "voicemeeter" -ErrorAction SilentlyContinue) {
+        Log "Voicemeeter already running"
+        return
+    }
+
+    $candidate = $VoicemeeterCandidates | Where-Object { Test-Path $_ } | Select-Object -First 1
+    if (-not $candidate) {
+        Log "Voicemeeter executable not found"
+        return
+    }
+
+    try {
+        Log "Starting Voicemeeter..."
+        Start-Process -FilePath $candidate
+
+        $timeout = 15
+        while (!(Get-Process -Name "voicemeeter8", "voicemeeter" -ErrorAction SilentlyContinue) -and $timeout -gt 0) {
+            Start-Sleep -Seconds 1
+            $timeout--
+        }
+
+        $proc = Get-Process -Name "voicemeeter8", "voicemeeter" -ErrorAction SilentlyContinue | Select-Object -First 1
+        if ($proc) {
+            Log "Voicemeeter started (PID=$($proc.Id)), hiding window..."
+            # Wait a moment for the window to appear, then hide it.
+            Start-Sleep -Seconds 3
+            if ($proc.MainWindowHandle -ne [IntPtr]::Zero) {
+                [Win32]::ShowWindow($proc.MainWindowHandle, [Win32]::SW_HIDE) | Out-Null
+            }
+        } else {
+            Log "Voicemeeter did not appear after launch attempt"
+        }
+    } catch {
+        Log "Failed to start Voicemeeter: $($_.Exception.Message)"
+    }
 }
 
 function Ensure-Steam {
@@ -50,6 +106,7 @@ function Ensure-Steam {
 
 Log "Arcade session starting"
 Set-KioskPolicy
+Ensure-Voicemeeter
 Ensure-Steam
 
 # Remove any stale game.running flag left by a crash or hard reboot
