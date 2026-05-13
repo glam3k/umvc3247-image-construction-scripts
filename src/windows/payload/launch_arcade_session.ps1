@@ -13,6 +13,33 @@ function Log($msg) {
     Add-Content -Path $Log -Value ("[{0}] {1}" -f (Get-Date), $msg)
 }
 
+function Remove-VBAudioStartupEntries {
+    # Voicemeeter and VB-Cable installers add themselves to Run keys.
+    # We want ONLY our script to start them (hidden), so remove auto-start.
+    $runKeys = @(
+        "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run",
+        "HKLM:\Software\Microsoft\Windows\CurrentVersion\Run",
+        "HKLM:\Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Run"
+    )
+    $patterns = @("*voicemeeter*", "*VB-Audio*", "*VBCable*", "*Cable*")
+    foreach ($key in $runKeys) {
+        if (-not (Test-Path $key)) { continue }
+        Get-ItemProperty $key | Get-Member -MemberType NoteProperty | ForEach-Object {
+            $name = $_.Name
+            $value = (Get-ItemPropertyValue -Path $key -Name $name -ErrorAction SilentlyContinue)
+            if ($value) {
+                foreach ($pattern in $patterns) {
+                    if ($value -like $pattern) {
+                        Log "Removing startup entry: $key\$name = $value"
+                        Remove-ItemProperty -Path $key -Name $name -Force -ErrorAction SilentlyContinue
+                        break
+                    }
+                }
+            }
+        }
+    }
+}
+
 function Set-KioskPolicy {
     $sys = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Policies\System"
     $exp = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer"
@@ -88,6 +115,7 @@ function Ensure-Voicemeeter {
 
 Log "Arcade session starting"
 Set-KioskPolicy
+Remove-VBAudioStartupEntries
 Ensure-Voicemeeter
 Ensure-Steam
 
